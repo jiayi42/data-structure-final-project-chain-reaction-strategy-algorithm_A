@@ -4,13 +4,6 @@
 #define MAX 1594871214
 using namespace std;
 
-/******************************************************
- * In your algorithm, you can just use the the funcitons
- * listed by TA to get the board information.(functions 
- * 1. ~ 4. are listed in next block)
- * 
- * The STL library functions is not allowed to use.
-******************************************************/
 //#include "../include/board.h"
 #include "../include/rules.h"
  ///////////////////////////////////////////////////////////////
@@ -79,10 +72,9 @@ Board boarddeepcopy(Board board) {
 }
 
 int danger(Board board ,int a,int b){return 4-(board.get_capacity(a, b)-board.get_orbs_num(a, b));}
-int row[4] = { -1, 0, 0, 1 };
-int col[4] = { 0, -1, 1, 0 };
-class LinkedList;     
-                      
+
+
+class LinkedList;                           
 class ListNode{
     private:
         int data;
@@ -137,7 +129,8 @@ class position {
         int x;int y; 
         position(int i, int j):x(i),y(j){}
 }; 
-
+int row[4] = { -1, 0, 0, 1 };
+int col[4] = { 0, -1, 1, 0 };
 int potential(Board board,int color){
     //this is for the number of critical same color cells
     /////////////////////////////
@@ -243,7 +236,6 @@ int BoardEvaluator(Board board, Player player,Player opponent,bool myturn) {
     int temp=0;
     for(int i=0;i<ROW;i++){
         for(int j=0;j<COL;j++){
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if(board.get_cell_color(i,j)==colorPlayer){
                 bool invulnerable = true;
                 orbPlayer+=board.get_orbs_num(i,j);
@@ -260,23 +252,13 @@ int BoardEvaluator(Board board, Player player,Player opponent,bool myturn) {
         }
     }
     orbScore+=orbPlayer;
-    ////////////////////////////////////////////////////
     int boom=fullpotential( board);
-    //int pboom=potential( board,colorPlayer);
     int oboom=potential( board,colorOpponent);
-    //int opboom=potential( board,color);
     if(orbPlayer>1 && orbOpponent==0) return 10000.0;
-    //if(boom>=24 && color==colorPlayer)return 10000.0;
     if(orbPlayer==0 && orbOpponent>1) return -10000.0;
 
-    ////////////////////////////////////////////////////////
-    //if(boom>18 &&  potential( board,colorOpponent)<4 && color==colorPlayer)orbScore-=100;// do not keep enemy alive when it is dangerous
-    //if(boom>=30 && pboom<16 && color==colorPlayer)orbScore+=20;
-    //if(boom>30 && (oboom-pboom)>4 && color==colorOpponent)orbScore+=boom;
-    //if(boom<20 && pboom>6 )orbScore-=pboom;
     if(orbOpponent<40){// enemy does not dominate the game
         if(myturn)orbScore-=oboom;//after I place, my Opponent has fewer chances to blow
-
         //else
         orbScore+=boom; //blow dominator
     }
@@ -354,30 +336,9 @@ position God_choose(Board board, Player player,int depth) {
 
     return choose;
 }
-////////////////////////////////////////////////////////////////////////////////
-/*************************************************************************
- * 1. int board.get_orbs_num(int row_index, int col_index)
- * 2. int board.get_capacity(int row_index, int col_index)
- * 3. char board.get_cell_color(int row_index, int col_index)
- * 4. void board.print_current_board(int row_index, int col_index, int round)
- * 
- * 1. The function that return the number of orbs in cell(row, col)
- * 2. The function that return the orb capacity of the cell(row, col)
- * 3. The function that return the color fo the cell(row, col)
- * 4. The function that print out the current board statement
-*************************************************************************/
-
 
 void algorithm_A(Board board, Player player, int index[]){
-
-    // cout << board.get_capacity(0, 0) << endl;
-    // cout << board.get_orbs_num(0, 0) << endl;
-    // cout << board.get_cell_color(0, 0) << endl;
-    // board.print_current_board(0, 0, 0);
-
         position god = God_choose(board, player,4);
         index[0] = god.x;
         index[1] = god.y;
-
-
 }
