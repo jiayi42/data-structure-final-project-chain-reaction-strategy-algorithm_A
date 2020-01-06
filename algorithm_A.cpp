@@ -165,6 +165,7 @@ int potential(Board board,int color){
                         }
                     }
                 }  
+                //1+ critical cells chains
                 if(potential_now>0)list.add(potential_now); 
             }
         }
@@ -206,6 +207,7 @@ int fullpotential(Board board){
                         }
                     }
                 }  
+                //only 2+ critical cells chains
                 if(potential_now>1)list.add(potential_now); 
             }
         }
@@ -241,11 +243,12 @@ int BoardEvaluator(Board board, Player player,Player opponent,bool myturn) {
             if(board.get_cell_color(i,j)==colorPlayer){
                 bool invulnerable = true;
                 orbPlayer+=board.get_orbs_num(i,j);
-                temp=checkdanger(board,colorOpponent,i,j);
+                temp=checkdanger(board,colorOpponent,i,j);//if checkdanger get critical opponent cells nearby (temp>0), invulnerable=false
                 if(temp>0){
                         orbScore-=checkdanger(board,colorOpponent,i,j);
                         invulnerable = false;
                 }
+                //profits for edges and corners when count critical opponent cells nearby (critical double profits)
                 if(invulnerable)orbScore+=nodangerscore(board,i,j);
             }
             else if(board.get_cell_color(i,j)==colorOpponent){
@@ -274,6 +277,8 @@ int BoardEvaluator(Board board, Player player,Player opponent,bool myturn) {
 int max (int a,int b) {return (a<b)?b:a;}
 int min (int a,int b) {return (a>b)?b:a;}
 int alpha_beta(Board board, int alpha,int beta,int depth, Player player,  bool myturn) {
+    // alpha beta game tree prune by recursive//
+    /////get opponent and its color///////////////////
     int colorPlayer = player.get_color();
     char colorOpponent;
     if(colorPlayer == 'r')
@@ -281,66 +286,77 @@ int alpha_beta(Board board, int alpha,int beta,int depth, Player player,  bool m
     else 
         colorOpponent = 'r';
     Player opponent(colorOpponent); 
+
     int score = BoardEvaluator(board, player,opponent,myturn);
+
     if(score == 10000) return score;
-    if(score == -10000) return score;
-    if(depth == 0)return score;
+    else if(score == -10000) return score;
+    else if(depth == 0)return score;
+    
     int best = -MAX;
     int worst= MAX;
+    
     if(!myturn) {
         best = -MAX; 
         for(int i = 0; i < ROW; i++) for(int j = 0; j < COL; j++) {
-            if (beta <= alpha) break;
+            if (beta <= alpha) break;//equivalent ===> prune by no more run
+            ///finding the sweet point...
+            //evaluate opponent future moves after I place
             if(board.get_cell_color(i,j) == colorPlayer || board.get_cell_color(i,j) == 'w') {
                 if (beta <= alpha) break;     
                 Board board_copy = boarddeepcopy(board);
                 board_copy.place_orb(i,j,&player);
+                ///new branch for myturn
                 best = max(best, alpha_beta(board_copy,alpha,beta, depth-1, player, true)); 
                 alpha = max(alpha, best);     
             }
         }
-
         return best;
     }
     else {
         worst= MAX;
         for(int i = 0; i < ROW; i++) for(int j = 0; j < COL; j++) {
             if (beta <= alpha) break;
+            ///finding the sweet point...
+            //evaluate my future moves after opponent places
             if(board.get_cell_color(i,j) == colorOpponent || board.get_cell_color(i,j) == 'w') {
                  if (beta <= alpha) break; 
                 Board board_copy = boarddeepcopy(board);
                 board_copy.place_orb(i,j,&opponent);
+                ///new branch for !myturn
                 worst = min(worst, alpha_beta(board_copy,alpha,beta, depth-1, player,false));
                 beta = min(beta, worst);
             }
         }
-
         return worst;
     }
 }
 position God_choose(Board board, Player player,int depth) {
     char colorPlayer = player.get_color();
-    int Best = -MAX;
+    int best = -MAX;
     position choose(0,0);
+    // initialize all possbile legal places to move
     for(int i = 0; i < ROW; i++) for(int j = 0; j < COL; j++) 
         if(board.get_cell_color(i,j) == colorPlayer || board.get_cell_color(i,j) == 'w'){
             Board board_copy = boarddeepcopy(board);
             board_copy.place_orb(i,j,&player);
+            /////////////////////alpha_beta starts//////////////////////////
             int alpha = -MAX;
             int beta =  MAX;
-            int movescore = alpha_beta(board_copy,alpha,beta, depth-1, player , true);
-            if(movescore > Best) {
-                Best = movescore;
+            int movevaluation = alpha_beta(board_copy,alpha,beta, depth-1, player , true);
+            if(movevaluation > best) {
+                best = movevaluation;
                 choose.x = i;
                 choose.y = j;
             }
+            /////////////////////alpha_beta ends//////////////////////////
         }
 
     return choose;
 }
 
 void algorithm_A(Board board, Player player, int index[]){
-        position god = God_choose(board, player,4);
-        index[0] = god.x;
-        index[1] = god.y;
+    position god = God_choose(board, player,4);
+    index[0] = god.x;
+    index[1] = god.y;
 }
