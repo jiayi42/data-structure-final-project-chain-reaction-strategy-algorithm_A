@@ -71,7 +71,7 @@ Board boarddeepcopy(Board board) {
     return b3.generatedeepcopy();
 }
 
-int danger(Board board ,int a,int b){return 4-(board.get_capacity(a, b)-board.get_orbs_num(a, b));}
+
 
 
 class LinkedList;                           
@@ -85,7 +85,6 @@ class ListNode{
 
         friend class LinkedList;
 };
-
 class LinkedList{
     private:
         ListNode *first;            
@@ -123,6 +122,7 @@ void LinkedList::Clear(){
         current = 0;
     }
 }
+
 class position { 
     public: 
         position(); 
@@ -131,6 +131,9 @@ class position {
 }; 
 int row[4] = { -1, 0, 0, 1 };
 int col[4] = { 0, -1, 1, 0 };
+
+int danger(Board board ,int a,int b){return 4-(board.get_capacity(a, b)-board.get_orbs_num(a, b));}
+
 int potential(Board board,int color){
     //this is for the number of critical same color cells
     /////////////////////////////
@@ -211,8 +214,8 @@ int fullpotential(Board board){
     temp=list.countlist();
     list.Clear();
     return temp;
-
 }
+
 int checkdanger(Board board,int colorOpponent,int i,int j){
     int temp=0;
     if(!index_range_illegal(i+1,j))if(board.get_cell_color(i+1,j)==colorOpponent && danger(board,i+1,j)==3)temp+=6-board.get_capacity(i, j);
@@ -228,7 +231,6 @@ bool nodangerscore(Board board,int i,int j){
     if(danger(board ,i,j)==3)temp*=2;
     return temp;
 }
-
 int BoardEvaluator(Board board, Player player,Player opponent,bool myturn) {
     char colorPlayer = player.get_color();
     char colorOpponent= opponent.get_color();
