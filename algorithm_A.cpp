@@ -142,7 +142,7 @@ int potential(Board board,int color){
     ///////////////////////
     bool visit[ROW][COL];
     for(int i=0;i<ROW;i++)for(int j=0;j<COL;j++)visit[i][j]=false;
-
+    //dfs find chains
     for(int i=0;i<ROW;i++){
         for(int j=0;j<COL;j++){
             if(!visit[i][j] && board.get_cell_color(i,j)==color && danger( board ,i,j)==3 ){
@@ -170,6 +170,7 @@ int potential(Board board,int color){
             }
         }
     }
+    //compute potential
     int temp=0;
     temp=list.countlist();
     list.Clear();
